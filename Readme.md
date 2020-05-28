@@ -206,11 +206,11 @@ HttpResponse response = client.execute(request);
 ```
 In this example, the client utilizes Sha256Hasher and HmacSha256Authenticator. These two classes are instances of BodyHasher and TbsAuthenticator providing a SHA-256 cryptographic hash for the body and an HMAC-SHA256 signature for the HTTP request. The complete code of this test client can be found here:
 
-[HttpTestClient](https://gitlab.com/thk.das/jREHMA/blob/master/src/test/java/de/thk/das/rest/security/http/rehma/client/HttpTestClient.java)
+[HttpTestClient](https://github.com/das-th-koeln/jCREHMA/blob/master/src/test/java/de/thk/das/rest/security/http/rehma/client/HttpTestClient.java)
 
 A test server using SigningResponseInterceptor and VerifyingRequestInterceptor is also included in jRHEMA as well. The complete code of the server is available here:
 
-[SimplejRHEMAServerSync](https://gitlab.com/thk.das/jREHMA/blob/master/src/test/java/de/thk/das/rest/security/http/rehma/server/SimplejRHEMAServerSync.java)
+[SimplejCRHEMAServerSync](https://github.com/das-th-koeln/jCREHMA/blob/master/src/test/java/de/thk/das/rest/security/http/rehma/server/SimplejCRHEMAServerSync.java)
 
 ## Dependencies
 * [Apache HttpComponents 4.5.1](https://hc.apache.org/downloads.cgi)
