@@ -185,7 +185,7 @@ The implementation of three other classes VerifyingResponseInterceptor, SigningR
 
 [SigningResponseInterceptor](https://github.com/das-th-koeln/jCREHMA/blob/master/src/main/java/de/thk/das/rest/security/http/crehma/ahc/SigningResponseInterceptor.java)
 
-[VerifyingRequestInterceptor](https://github.com/das-th koeln/jCREHMA/blob/master/src/main/java/de/thk/das/rest/security/http/crehma/ahc/VerifyingRequestInterceptor.java)
+[VerifyingRequestInterceptor](https://github.com/das-th-koeln/jCREHMA/blob/master/src/main/java/de/thk/das/rest/security/http/crehma/ahc/VerifyingRequestInterceptor.java)
 
 The following Listing depicts how to include SigningRequestInterceptor and VerifyingResposeInterceptor in an Apache HttpComponents client. 
 ```java
