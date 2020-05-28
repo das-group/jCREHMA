@@ -179,7 +179,7 @@ After signing the request, the request header fields are reset. Now, the header 
 
 The implementation of three other classes VerifyingResponseInterceptor, SigningResponseInterceptor and VerifyingRequestInterceptor are similar. For details please take a look at these classes:
 
-[SigningRequestInterceptor](https://gitlab.com/thk.das/jREHMA/blob/master/src/main/java/de/thk/das/rest/security/http/rehma/ahc/SigningRequestInterceptor.java)
+[SigningRequestInterceptor](https://github.com/das-th-koeln/blob/master/src/main/java/de/thk/das/rest/security/http/rehma/ahc/SigningRequestInterceptor.java)
 
 [VerifyingResponseInterceptor](https://gitlab.com/thk.das/jREHMA/blob/master/src/main/java/de/thk/das/rest/security/http/rehma/ahc/VerifyingResponseInterceptor.java)
 
