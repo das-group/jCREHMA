@@ -50,7 +50,7 @@ import de.thk.das.rest.security.http.crehma.ahc.SigningResponseInterceptor;
 import de.thk.das.rest.security.http.crehma.ahc.VerifyingRequestInterceptor;
 import de.thk.das.rest.security.http.crehma.hash.Sha256Hasher;
 import de.thk.das.rest.security.http.crehma.sig.HmacSha256Authenticator;
-public class SimplejREHMAServerAsync {
+public class SimplejCREHMAServerAsync {
 	private ListeningIOReactor ioReactor;
 	public static void main(String[] args) throws Exception {
         String base64Key = "";
@@ -84,12 +84,12 @@ public class SimplejREHMAServerAsync {
                 .add(new ResponseConnControl())
                 .addLast(new SigningResponseInterceptor("jREHMAKey",hmacSha256Authenticator,sha256Hasher)).build();
         
-		new SimplejREHMAServerAsync(httpProcessor, 8088).start();
+		new SimplejCREHMAServerAsync(httpProcessor, 8088).start();
 	}
 	
 	private HttpProcessor httpProcessor;
 	private int port;
-	public SimplejREHMAServerAsync(HttpProcessor httpProcessor, int port){
+	public SimplejCREHMAServerAsync(HttpProcessor httpProcessor, int port){
 		this.httpProcessor = httpProcessor;
 		this.port = port;
 	}

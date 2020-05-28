@@ -82,20 +82,16 @@ public class HttpTestClient {
 	    HttpClient client = HttpClients.custom().addInterceptorLast(sri).addInterceptorFirst(vri).build();
 	    
 	    sri.setSignRequest(true);
-//	    HttpClient client = HttpClients.custom().build();
-//	    HttpClient client = HttpClients.custom().addInterceptorLast(sri).build();
 	    
 		
 		long requestId = new Date().getTime();
 		
 		String host = "139.6.102.29";
-//		host = "dajz868yn0ahk.cloudfront.net";
+
 		host = "d5esw3092ua6w.cloudfront.net";
 
 		host = "ec2-34-241-245-90.eu-west-1.compute.amazonaws.com";
-		//host = "cachetest.hoaiviet.de";
-		//host = "139.6.102.38:3000";
-		//host = "139.6.102.112";
+
 		
 		HttpGet getRequest = new HttpGet("http://"+host);
 		getRequest = new HttpGet("http://"+host+"/rsc/"+requestId);

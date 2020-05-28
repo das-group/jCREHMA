@@ -34,21 +34,21 @@ import de.thk.das.rest.security.http.crehma.sig.HmacSha256Authenticator;
 /**
  * jREHMA HTTP test server 
  */
-public class SimplejRHEMAServerSync {
+public class SimplejCRHEMAServerSync {
 
 	private int port;
 	private HttpServer server;
 	
     public static void main(String[] args) throws Exception {
-       SimplejRHEMAServerSync server = new SimplejRHEMAServerSync(8088);
+       SimplejCRHEMAServerSync server = new SimplejCRHEMAServerSync(8088);
        server.start();
     }
     
-    public SimplejRHEMAServerSync(int port){
+    public SimplejCRHEMAServerSync(int port){
     	this.port = port;
     }
     
-    public SimplejRHEMAServerSync(int port, HttpServer server){
+    public SimplejCRHEMAServerSync(int port, HttpServer server){
     	this(port);
     	this.server = server;
     }
@@ -74,7 +74,7 @@ public class SimplejRHEMAServerSync {
     	    Sha256Hasher sha256Hasher= new Sha256Hasher();
     	    HashMap<String, byte[]> hmacKeyStore = new HashMap<String, byte[]>();
     	    
-    	    hmacKeyStore.put("jREHMAKey", key);
+    	    hmacKeyStore.put("jCREHMAKey", key);
     	    HmacSha256Authenticator hmacSha256Authenticator = new HmacSha256Authenticator(hmacKeyStore);
 
             SocketConfig socketConfig = SocketConfig.custom()
@@ -88,7 +88,7 @@ public class SimplejRHEMAServerSync {
                     .setSocketConfig(socketConfig)
                     .registerHandler("*", new RequestHandlerSync())
                     .addInterceptorFirst(new VerifyingRequestInterceptor(hmacSha256Authenticator, sha256Hasher))
-                    .addInterceptorLast(new SigningResponseInterceptor("jREHMAKey", hmacSha256Authenticator, sha256Hasher))
+                    .addInterceptorLast(new SigningResponseInterceptor("jCREHMAKey", hmacSha256Authenticator, sha256Hasher))
                     .create();
     	}
     	server.start();

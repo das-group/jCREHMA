@@ -35,7 +35,7 @@ import de.thk.das.rest.security.http.crehma.ahc.SigningRequestInterceptor;
 import de.thk.das.rest.security.http.crehma.ahc.VerifyingResponseInterceptor;
 import de.thk.das.rest.security.http.crehma.hash.Sha256Hasher;
 import de.thk.das.rest.security.http.crehma.sig.HmacSha256Authenticator;
-import de.thk.das.rest.security.http.rehma.server.SimplejRHEMAServerSync;
+import de.thk.das.rest.security.http.rehma.server.SimplejCRHEMAServerSync;
 
 /**
  * Unit test for jREHMA.
@@ -45,7 +45,7 @@ public class AppTest
 	private static String host = "http://localhost";
 	private static int port = 8088;
 	private static HttpClient client;
-	private static SimplejRHEMAServerSync server;
+	private static SimplejCRHEMAServerSync server;
 	
     @Test
     public void testGET() throws ClientProtocolException, IOException
@@ -144,7 +144,7 @@ public class AppTest
 
 			@Override
 			public void run() {
-				server = new SimplejRHEMAServerSync(port);
+				server = new SimplejCRHEMAServerSync(port);
 				try {
 					server.start();
 				} catch (IOException e) {
