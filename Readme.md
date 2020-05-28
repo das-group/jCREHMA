@@ -103,19 +103,19 @@ Valid Request Signature 1585558698960
 
 Based on the Signature header, the client validates the request message's authenticity and integrity. 
 
-jREHMA includes 4 main classes for signing and verifying HTTP messages: RequestSigner, ResponseVerifyer, ResponseSigner and RequestVerifyer. As the name implies, RequestSigner is considered to be used in HTTP clients to sign HTTP requests and ResponseVerifyer can be used to verify incoming HTTP responses. The other two classes, ResponseSigner and RequestVerifyer can be used by Webservers or REST-based Web Services to authenticate HTTP requests  and protect HTTP responses against man-in-the-middle attacks. 
+jCREHMA includes 4 main classes for signing and verifying HTTP messages: RequestSigner, ResponseVerifyer, ResponseSigner and RequestVerifyer. As the name implies, RequestSigner is considered to be used in HTTP clients to sign HTTP requests and ResponseVerifyer can be used to verify incoming HTTP responses. The other two classes, ResponseSigner and RequestVerifyer can be used by Webservers or REST-based Web Services to authenticate HTTP requests  and protect HTTP responses against man-in-the-middle attacks. 
 
 These four classes are considered to be used in interceptors (in some frameworks also called as filters) to sign and verify traversing HTTP messages. Note, that the interceptor must have access to the whole HTTP message in order the sign all security-relevant header fields and the body. If your framework does not support interceptors or its interceptors can not access the whole HTTP message, jREHMA can also be used in a proxy. 
-Using jREHMA in proxies should only be taken into consideration, if interceptors are not provided, as proxies do not ensure end-to-end security. 
+Using jCREHMA in proxies should only be taken into consideration, if interceptors are not provided, as proxies do not ensure end-to-end security. 
 
-## Using jREHMA in interceptors
+## Using jCREHMA in interceptors
 Many frameworks for developing Web Applications and Web Services provide interceptors for pre- or post-processing HTTP messages. Usually interceptor are java interfaces which can be implemented by any class.
 
-So, one way of using jREHMA in interceptors is to extend the four main classes of jREHMA and simultaneously implement the interceptor interface. 
+So, one way of using jCREHMA in interceptors is to extend the four main classes of jCREHMA and simultaneously implement the interceptor interface. 
 We have already implemented 4 interceptors for Apache HttpComponents: SigningRequestInterceptor, VerifyingResponseInterceptor, SigningResponseInterceptor and VerifyingRequestInterceptor.
 
-In the following we demonstrate the integration of jREHMA in Apache HTTPComponents interceptors. By means of this example, the integration of jREHMA in other interceptors of other Web frameworks and proxies can be adopted likewise. 
-### Using jREHMA in Apache HTTPComponents
+In the following we demonstrate the integration of jCREHMA in Apache HTTPComponents interceptors. By means of this example, the integration of jCREHMA in other interceptors of other Web frameworks and proxies can be adopted likewise. 
+### Using jCREHMA in Apache HTTPComponents
 Apache HTTPComponents is a Java library offering a toolset for implementing low level HTTP components. The following example shows how to incorporate the RequestSigner into an Apache HTTPComponents HttpRequestInterceptor.
 ```java
 public class SigningRequestInterceptor extends RequestSigner implements HttpRequestInterceptor {
@@ -171,7 +171,7 @@ TbsAuthenticator is an interface where one can define and implement the signatur
 
 The process method is the to be implemented function of the HttpRequestInterceptor interface. Here we can process the request, e.g, sign it. The first thing to do is to store the request method in the HttpContext object. This object enables sharing information among various related components such as other interceptors. Later, the VerifyingResponseInterceptor will use the stored method of the HttpContext object to check whether the response contains the required header fields which is needed by the corresponding request. 
 
-The next step is to map the incoming request into HttpBasicRequest object which is the format used by jREHMA to process the request.
+The next step is to map the incoming request into HttpBasicRequest object which is the format used by jCREHMA to process the request.
 
 This HttpBasicRequest object is given together with sig, kid, hash and additionHeaders to the sign method. As name implies this method signs the request according to information provided by the arguments. It also appends mandatory header fields in case they were absent. 
 
@@ -194,9 +194,9 @@ byte[] key = Base64.decodeBase64(base64Key);
 
 Sha256Hasher  sha256Hasher = new Sha256Hasher();
 HmacSha256Authenticator hmacSha256Authenticator = new HmacSha256Authenticator();
-hmacSha256Authenticator.getHmacKeyStore().put("jREHMAKey", key);
+hmacSha256Authenticator.getHmacKeyStore().put("jCREHMAKey", key);
 
-SigningRequestInterceptor sri = new SigningRequestInterceptor("jREHMAKey",hmacSha256Authenticator, sha256Hasher);
+SigningRequestInterceptor sri = new SigningRequestInterceptor("jCREHMAKey",hmacSha256Authenticator, sha256Hasher);
 VerifyingResponseInterceptor vri = new VerifyingResponseInterceptor(hmacSha256Authenticator, sha256Hasher);
 
 HttpClient client = HttpClients.custom().addInterceptorLast(sri).addInterceptorFirst(vri).build();
