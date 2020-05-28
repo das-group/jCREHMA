@@ -103,6 +103,114 @@ Valid Request Signature 1585558698960
 
 Based on the Signature header, the client validates the request message's authenticity and integrity. 
 
+jREHMA includes 4 main classes for signing and verifying HTTP messages: RequestSigner, ResponseVerifyer, ResponseSigner and RequestVerifyer. As the name implies, RequestSigner is considered to be used in HTTP clients to sign HTTP requests and ResponseVerifyer can be used to verify incoming HTTP responses. The other two classes, ResponseSigner and RequestVerifyer can be used by Webservers or REST-based Web Services to authenticate HTTP requests  and protect HTTP responses against man-in-the-middle attacks. 
+
+These four classes are considered to be used in interceptors (in some frameworks also called as filters) to sign and verify traversing HTTP messages. Note, that the interceptor must have access to the whole HTTP message in order the sign all security-relevant header fields and the body. If your framework does not support interceptors or its interceptors can not access the whole HTTP message, jREHMA can also be used in a proxy. 
+Using jREHMA in proxies should only be taken into consideration, if interceptors are not provided, as proxies do not ensure end-to-end security. 
+
+## Using jREHMA in interceptors
+Many frameworks for developing Web Applications and Web Services provide interceptors for pre- or post-processing HTTP messages. Usually interceptor are java interfaces which can be implemented by any class.
+
+So, one way of using jREHMA in interceptors is to extend the four main classes of jREHMA and simultaneously implement the interceptor interface. 
+We have already implemented 4 interceptors for Apache HttpComponents: SigningRequestInterceptor, VerifyingResponseInterceptor, SigningResponseInterceptor and VerifyingRequestInterceptor.
+
+In the following we demonstrate the integration of jREHMA in Apache HTTPComponents interceptors. By means of this example, the integration of jREHMA in other interceptors of other Web frameworks and proxies can be adopted likewise. 
+### Using jREHMA in Apache HTTPComponents
+Apache HTTPComponents is a Java library offering a toolset for implementing low level HTTP components. The following example shows how to incorporate the RequestSigner into an Apache HTTPComponents HttpRequestInterceptor.
+```java
+public class SigningRequestInterceptor extends RequestSigner implements HttpRequestInterceptor {
+  private String kid;
+  private String hash;
+  private String sig;
+  private ArrayList<String> additionalHeaders;
+	
+  public SigningRequestInterceptor(){
+    super();
+  }
+	
+  public SigningRequestInterceptor(String kid, TbsAuthenticator tbsAuthenticator, BodyHasher bodyHasher) {
+    super(tbsAuthenticator, bodyHasher);
+    this.sig = tbsAuthenticator.getName();
+    this.hash = bodyHasher.getName();
+    this.kid = kid;
+    this.additionalHeaders = new ArrayList<String>();
+  }
+
+  @Override
+  public void process(HttpRequest request, HttpContext context)  throws HttpException, IOException {
+    //Set HTTP-Method for VerifyingResponseInterceptor
+    context.setAttribute("Method",request.getRequestLine().getMethod());
+		
+    HttpBasicRequest basicRequest = new HttpBasicRequest(request.getRequestLine().getUri(),
+    request.getRequestLine().getMethod());
+    basicRequest.setHeaders(request.getAllHeaders());
+    byte[] body = new byte[0];		
+    
+    if(request instanceof HttpEntityEnclosingRequest){
+      body = IOUtils.toByteArray(((HttpEntityEnclosingRequest) request).getEntity().getContent());
+    }
+    basicRequest.setEntity(new ByteArrayEntity(body));
+		
+    try {
+      sign(basicRequest, this.sig, this.kid, this.hash, this.additionalHeaders);
+    } catch (Exception e) {
+      e.printStackTrace();
+    }
+    request.setHeaders(basicRequest.getAllHeaders());
+  }
+  // Getters and Setters
+  ...
+}
+```
+The 4 instance variables will be used later by the client to define and describe the signature generation process: kid specifies the key id, hash defines the hash algorithm name, sig describes the signature algorithm name and additionalHeaders informs the signature generation process whether and which additional security-relevant header fields need to be signed.
+
+The first constructor has not any arguments. Here, only the super method is invoked. The second constructor has three arguments which encompass the key id, a TbsAuthenticator and a BodyHasher.
+TbsAuthenticator is an interface where one can define and implement the signature algorithm which signs or verifies HTTP messages. Bodyhasher represents an interface which is used to define the hash algorithm to hash the body. Further information on defining and including signature and hash algorithm can be found here:
+
+[Defining and signature and hash algorithm](https://gitlab.com/thk.das/jREHMA/wikis/defining_signature_and_hash_algorithm)
+
+The process method is the to be implemented function of the HttpRequestInterceptor interface. Here we can process the request, e.g, sign it. The first thing to do is to store the request method in the HttpContext object. This object enables sharing information among various related components such as other interceptors. Later, the VerifyingResponseInterceptor will use the stored method of the HttpContext object to check whether the response contains the required header fields which is needed by the corresponding request. 
+
+The next step is to map the incoming request into HttpBasicRequest object which is the format used by jREHMA to process the request.
+
+This HttpBasicRequest object is given together with sig, kid, hash and additionHeaders to the sign method. As name implies this method signs the request according to information provided by the arguments. It also appends mandatory header fields in case they were absent. 
+
+After signing the request, the request header fields are reset. Now, the header fields also include the new header field Signature which includes the signature value of the request along with the signature description including the key id, signature as well as hash algorithm name, a time stamp, and the additional header fields to be signed, if any. 
+
+The implementation of three other classes VerifyingResponseInterceptor, SigningResponseInterceptor and VerifyingRequestInterceptor are similar. For details please take a look at these classes:
+
+[SigningRequestInterceptor](https://gitlab.com/thk.das/jREHMA/blob/master/src/main/java/de/thk/das/rest/security/http/rehma/ahc/SigningRequestInterceptor.java)
+
+[VerifyingResponseInterceptor](https://gitlab.com/thk.das/jREHMA/blob/master/src/main/java/de/thk/das/rest/security/http/rehma/ahc/VerifyingResponseInterceptor.java)
+
+[SigningResponseInterceptor](https://gitlab.com/thk.das/jREHMA/blob/master/src/main/java/de/thk/das/rest/security/http/rehma/ahc/SigningResponseInterceptor.java)
+
+[VerifyingRequestInterceptor](https://gitlab.com/thk.das/jREHMA/blob/master/src/main/java/de/thk/das/rest/security/http/rehma/ahc/VerifyingRequestInterceptor.java)
+
+The following Listing depicts how to include SigningRequestInterceptor and VerifyingResposeInterceptor in an Apache HttpComponents client. 
+```java
+String base64Key = "fJW7ebII2E4RU3...";
+byte[] key = Base64.decodeBase64(base64Key);
+
+Sha256Hasher  sha256Hasher = new Sha256Hasher();
+HmacSha256Authenticator hmacSha256Authenticator = new HmacSha256Authenticator();
+hmacSha256Authenticator.getHmacKeyStore().put("jREHMAKey", key);
+
+SigningRequestInterceptor sri = new SigningRequestInterceptor("jREHMAKey",hmacSha256Authenticator, sha256Hasher);
+VerifyingResponseInterceptor vri = new VerifyingResponseInterceptor(hmacSha256Authenticator, sha256Hasher);
+
+HttpClient client = HttpClients.custom().addInterceptorLast(sri).addInterceptorFirst(vri).build();
+HttpGet request = new HttpGet("http://localhost:8081/courses");
+request.setHeader("Accept", "application/json");
+HttpResponse response = client.execute(request);
+```
+In this example, the client utilizes Sha256Hasher and HmacSha256Authenticator. These two classes are instances of BodyHasher and TbsAuthenticator providing a SHA-256 cryptographic hash for the body and an HMAC-SHA256 signature for the HTTP request. The complete code of this test client can be found here:
+
+[HttpTestClient](https://gitlab.com/thk.das/jREHMA/blob/master/src/test/java/de/thk/das/rest/security/http/rehma/client/HttpTestClient.java)
+
+A test server using SigningResponseInterceptor and VerifyingRequestInterceptor is also included in jRHEMA as well. The complete code of the server is available here:
+
+[SimplejRHEMAServerSync](https://gitlab.com/thk.das/jREHMA/blob/master/src/test/java/de/thk/das/rest/security/http/rehma/server/SimplejRHEMAServerSync.java)
 
 ## Dependencies
 * [Apache HttpComponents 4.5.1](https://hc.apache.org/downloads.cgi)
