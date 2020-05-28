@@ -167,7 +167,7 @@ The 4 instance variables will be used later by the client to define and describe
 The first constructor has not any arguments. Here, only the super method is invoked. The second constructor has three arguments which encompass the key id, a TbsAuthenticator and a BodyHasher.
 TbsAuthenticator is an interface where one can define and implement the signature algorithm which signs or verifies HTTP messages. Bodyhasher represents an interface which is used to define the hash algorithm to hash the body. Further information on defining and including signature and hash algorithm can be found here:
 
-[Defining and signature and hash algorithm](https://gitlab.com/thk.das/jREHMA/wikis/defining_signature_and_hash_algorithm)
+[Defining and signature and hash algorithm](https://github.com/das-th-koeln/jCREHMA/wiki/Defining-signature-and-hash-algorithms)
 
 The process method is the to be implemented function of the HttpRequestInterceptor interface. Here we can process the request, e.g, sign it. The first thing to do is to store the request method in the HttpContext object. This object enables sharing information among various related components such as other interceptors. Later, the VerifyingResponseInterceptor will use the stored method of the HttpContext object to check whether the response contains the required header fields which is needed by the corresponding request. 
 
