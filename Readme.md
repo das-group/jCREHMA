@@ -1,6 +1,6 @@
 # jCREHMA
 CREHMA stands for Cache-ware REST-ful HTTP Message Authentication. It is an end-to-end authenticity and integrity scheme for HTTP messages that can be used in conjunction with web caches.  To ensure end-to-end authenticity and integrity, CREHMA builds a signature over the whole HTTP message. Response messages can also be cached and modified by intermediate systems without running into the risk that the signature value is classified as invalid or a replay attack.  To do so, each signed response message  includes a signature freshness. With this value clients can verify whether a response is reused by a legitimate cache.
-CREHMA.js is designed to be used in any Javascript-based environemt such as Node, vert.x or in the Webbrowser. 
+jCREHMA is a Java-based reference implementation of CREHMA.  
 
 # How does it works?
 CREHMA creates a digital signature over the whole HTTP message by concatenating the security-critical headers and the body to a string. This concatenated string is then signed by a given key. The signature value in conjunction with signature meta data is then included the Signature header. The other endpoint, i.e client or server, verifies the message's authenticity and integrity by validating the signature value in the Signature header with a given key. 
